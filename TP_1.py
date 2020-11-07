@@ -5,6 +5,7 @@ Created on Sat Nov  7 09:20:18 2020
 @author: 33643
 """
 import numpy as np
+import scipy.linalg as sal
 
 #Atmosphere characteristics
 gamma = 1.4
@@ -66,6 +67,8 @@ mdm = (Q*S*lref*Cmdm)/(Iyy)
 
 A = np.zeros([6,6])
 B = np.zeros([6,1])
+C = np.eye(6)
+D = 0
 
 A[0,0] = -Xv
 A[0,1] = -Xg
@@ -85,5 +88,9 @@ B[2] = -Zdm
 B[3] = mdm
 
 np.set_printoptions(4,suppress=True)
-print(A)
-print(B)
+print("A : \n",A)
+print("B : \n",B)
+print("C : \n",C)
+print("D : \n",D)
+
+print(sal.eig(A))
