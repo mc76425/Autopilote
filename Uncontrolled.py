@@ -18,8 +18,8 @@ C = 0.52
 f_delta = 0.9
 f = 0.608
 l_t = 3/2*5.24 #m
-X = f_delta*l_t - C*l_t
-Y = f_delta*l_t - f*l_t
+X = f*l_t - C*l_t
+Y = f_delta*l_t - C*l_t
 
 # Initialization
 alpha, Fpx = 0, 0
@@ -60,7 +60,6 @@ while abs(alphaList[i] - alphaList[i-1])>epsilon:
 
 x = np.linspace(0, len(alphaList), len(alphaList))
 print(Fpx)
-print(len(alphaList))
-print(len(x))
-plot(x, alphaList)
-show()
+print(Cz_eq)
+print(alpha)
+
