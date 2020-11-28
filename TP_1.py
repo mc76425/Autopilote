@@ -8,6 +8,7 @@ import numpy as np
 import scipy.linalg as sal
 import control.matlab as coma
 import matplotlib.pyplot as plt
+from sisopy31 import *
 
 #Atmosphere characteristics
 gamma = 1.4
@@ -128,6 +129,15 @@ plt.ylabel("Amplitude")
 plt.title("Phugoid step response")
 plt.legend(["V", "gamma"])
 plt.show()
+
+print("Step info for V : \n")
+a,b,c = step_info(Tp_v, Yp_v)
+print("Overshoot (%) : {} Rise time (s) : {} Settling time : {}".format(a,b,c))
+
+print("Step info for gamma : \n")
+a,b,c = step_info(Tp_g, Yp_g)
+print("Overshoot (%) : {} Rise time (s) : {} Settling time : {}".format(a,b,c))
+
 ############################################################ Short period
 
 Asp = A[2:4,2:4]
@@ -157,5 +167,20 @@ plt.title("Short-period step response")
 plt.legend(["alpha", "q"])
 plt.show()
 
+print("Step info for alpha : \n")
+a,b,c = step_info(Tsp_a, Ysp_a)
+print("Overshoot (%) : {} Rise time (s) : {} Settling time : {}".format(a,b,c))
+
+print("Step info for q : \n")
+a,b,c = step_info(Tsp_q, Ysp_q)
+print("Overshoot (%) : {} Rise time (s) : {} Settling time : {}".format(a,b,c))
+
 ############################################################ New state space vector
 
+As = A[1:6,0:5]
+Bs = B[1:6,0:1]
+Cs_q = np.array([0,0,1,0,0])
+Ds = np.zeros([5,1])
+syss = coma.ss(As,Bs,Cs_q,0)
+TFs = coma.tf(syss)
+dragGUI(TFs)
