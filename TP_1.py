@@ -6,6 +6,8 @@ Created on Sat Nov  7 09:20:18 2020
 """
 import numpy as np
 import scipy.linalg as sal
+import control.matlab as coma
+import matplotlib.pyplot as plt
 
 #Atmosphere characteristics
 gamma = 1.4
@@ -93,4 +95,67 @@ print("B : \n",B)
 print("C : \n",C)
 print("D : \n",D)
 
-print(sal.eig(A))
+sys = coma.ss(A,B,C,D)
+coma.damp(sys)
+print("\n")
+
+############################################################ Phugoid
+
+Ap = A[0:2,0:2]
+Bp = B[0:2,0:1]
+Cpv = np.array([1,0])
+Cpg = np.array([0,1])
+sysp_v = coma.ss(Ap,Bp,Cpv,0)
+sysp_g = coma.ss(Ap,Bp,Cpg,0)
+print("Eigenvalues of Phugoid mode\n")
+[print(round(i,5)) for i in sal.eig(Ap)[0]]
+
+print("\n")
+TFp_V_dm = coma.ss2tf(sysp_v)
+print("TF V/delta_m = ",TFp_V_dm,"\n")
+plt.figure(1)
+Yp_v, Tp_v = coma.step(TFp_V_dm, np.arange(0,500,0.1))
+
+
+print("\n")
+TFp_G_dm = coma.ss2tf(sysp_g)
+print("TF G/delta_m = ",TFp_G_dm,"\n")
+Yp_g, Tp_g = coma.step(TFp_G_dm, np.arange(0,500,0.1))
+
+plt.plot(Tp_v, Yp_v, 'b', Tp_g, Yp_g, 'r')
+plt.xlabel("Time (s)")
+plt.ylabel("Amplitude")
+plt.title("Phugoid step response")
+plt.legend(["V", "gamma"])
+plt.show()
+############################################################ Short period
+
+Asp = A[2:4,2:4]
+Bsp = B[2:4,0:1]
+Cspa = np.array([1,0])
+Cspq = np.array([0,1])
+syssp_a = coma.ss(Asp,Bsp,Cspa,0)
+syssp_q = coma.ss(Asp,Bsp,Cspq,0)
+print("Eigenvalues of Short period mode\n")
+[print(round(i,5)) for i in sal.eig(Asp)[0]]
+
+print("\n")
+TFsp_a_dm = coma.tf(syssp_a)
+print("TF V/delta_m = ",TFsp_a_dm,"\n")
+plt.figure(2)
+Ysp_a, Tsp_a = coma.step(TFsp_a_dm, np.arange(0,10,0.01))
+
+print("\n")
+TFsp_q_dm = coma.tf(syssp_q)
+print("TF G/delta_m = ",TFsp_q_dm,"\n")
+Ysp_q, Tsp_q = coma.step(TFsp_q_dm, np.arange(0,10,0.01))
+
+plt.plot(Tsp_a, Ysp_a, 'b', Tsp_q, Ysp_q, 'r')
+plt.xlabel("Time (s)")
+plt.ylabel("Amplitude")
+plt.title("Short-period step response")
+plt.legend(["alpha", "q"])
+plt.show()
+
+############################################################ New state space vector
+
