@@ -45,12 +45,12 @@ Feq = 62916.1 #N
 
 Q = (1/2)*rho*(Veq**2) 
 Cxeq = Cx0 + k*(Czeq**2)
-Cxa = Cx0 + k*(Cza**2)
-Cxdm = Cx0 + k*(Czdm**2)
+Cxa = 2*k*Cza*Czeq
+Cxdm = 2*k*Czdm*Czeq
 Iyy = m*(rg**2)
 
-X = f*lt - c*lt
-Y = fd*lt - c*lt
+X = -lt*(f-c)
+Y = -lt*(fd-c)
 
 Cma = (X/lref)*(Cxa*np.sin(aeq) + Cza*np.cos(aeq))
 Cmdm = (Y/lref)*(Cxdm*np.sin(aeq) + Czdm*np.cos(aeq))
@@ -61,14 +61,14 @@ Xg = (g0*np.cos(gammaeq))/(Veq)
 Xa = (Feq*np.sin(aeq)+(Q*S*Cxa))/(m*Veq)
 Za = (Feq*np.cos(aeq)+(Q*S*Cza))/(m*Veq)
 ma = (Q*S*lref*Cma)/(Iyy)
-mq = (Q*S*lref*Cmq)/(Iyy)
+mq = (Q*S*lref**2*Cmq)/(Veq*Iyy)
 Zdm = (Q*S*Czdm)/(m*Veq)
 mdm = (Q*S*lref*Cmdm)/(Iyy)
 
 A = np.zeros([6,6])
 B = np.zeros([6,1])
 C = np.eye(6)
-D = 0
+D = np.zeros([6,1])
 
 A[0,0] = -Xv
 A[0,1] = -Xg
