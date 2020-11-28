@@ -7,6 +7,7 @@ Created on Sat Nov  7 09:20:18 2020
 import numpy as np
 import scipy.linalg as sal
 import control.matlab as coma
+import control as co
 import matplotlib.pyplot as plt
 from sisopy31 import *
 
@@ -114,7 +115,7 @@ print("Eigenvalues of Phugoid mode\n")
 print("\n")
 TFp_V_dm = coma.ss2tf(sysp_v)
 print("TF V/delta_m = ",TFp_V_dm,"\n")
-plt.figure(1)
+plt.figure(2)
 Yp_v, Tp_v = coma.step(TFp_V_dm, np.arange(0,500,0.1))
 
 
@@ -152,7 +153,7 @@ print("Eigenvalues of Short period mode\n")
 print("\n")
 TFsp_a_dm = coma.tf(syssp_a)
 print("TF V/delta_m = ",TFsp_a_dm,"\n")
-plt.figure(2)
+plt.figure(3)
 Ysp_a, Tsp_a = coma.step(TFsp_a_dm, np.arange(0,10,0.01))
 
 print("\n")
@@ -177,10 +178,25 @@ print("Overshoot (%) : {} Rise time (s) : {} Settling time : {}".format(a,b,c))
 
 ############################################################ New state space vector
 
-As = A[1:6,0:5]
+As = A[1:6,1:6]
 Bs = B[1:6,0:1]
 Cs_q = np.array([0,0,1,0,0])
 Ds = np.zeros([5,1])
 syss = coma.ss(As,Bs,Cs_q,0)
 TFs = coma.tf(syss)
-dragGUI(TFs)
+print(coma.pole(syss))
+#sisotool(-TFs)
+syss_CL = co.feedback(0.1544*syss,-1)
+print(syss_CL)
+TF_CL = coma.ss2tf(syss_CL)
+print(TF_CL)
+print(coma.damp(syss_CL))
+
+plt.figure(4)
+Y_cl, T_cl = coma.step(TF_CL, np.arange(0,5,0.01))
+
+plt.plot(T_cl, Y_cl,'b')
+plt.xlabel("Time (s)")
+plt.ylabel("Amplitude")
+plt.title("Closed loop step response")
+plt.show()
