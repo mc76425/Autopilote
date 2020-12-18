@@ -186,17 +186,29 @@ syss = coma.ss(As,Bs,Cs_q,0)
 TFs = coma.tf(syss)
 print(coma.pole(syss))
 #sisotool(-TFs)
-syss_CL = co.feedback(0.1544*syss,-1)
+Kr = -0.1544
+syss_CL = co.feedback(co.series(Kr,syss),1,sign=-1)
 print(syss_CL)
 TF_CL = coma.ss2tf(syss_CL)
 print(TF_CL)
 print(coma.damp(syss_CL))
 
 plt.figure(4)
-Y_cl, T_cl = coma.step(TF_CL, np.arange(0,5,0.01))
+Y_cl, T_cl = coma.step(syss_CL, T=np.arange(0,10,0.01))
 
 plt.plot(T_cl, Y_cl,'b')
 plt.xlabel("Time (s)")
 plt.ylabel("Amplitude")
 plt.title("Closed loop step response")
 plt.show()
+
+###############################################################
+tau = 0.2
+
+As = A[1:6,1:6]
+Bs = B[1:6,0:1]
+Cs_q = np.array([0,1,1,0,0])
+Ds = np.zeros([5,1])
+
+TF_wo = coma.tf([0, tau], [1, tau])
+syss_CLwo = co.feedback(co.series(Kr,syss),1,sign=-1)
