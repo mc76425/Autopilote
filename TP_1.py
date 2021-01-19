@@ -152,13 +152,13 @@ print("Eigenvalues of Short period mode\n")
 
 print("\n")
 TFsp_a_dm = coma.tf(syssp_a)
-print("TF V/delta_m = ",TFsp_a_dm,"\n")
+print("TF a/delta_m = ",TFsp_a_dm,"\n")
 plt.figure(3)
 Ysp_a, Tsp_a = coma.step(TFsp_a_dm, np.arange(0,10,0.01))
 
 print("\n")
 TFsp_q_dm = coma.tf(syssp_q)
-print("TF G/delta_m = ",TFsp_q_dm,"\n")
+print("TF q/delta_m = ",TFsp_q_dm,"\n")
 Ysp_q, Tsp_q = coma.step(TFsp_q_dm, np.arange(0,10,0.01))
 
 plt.plot(Tsp_a, Ysp_a, 'b', Tsp_q, Ysp_q, 'r')
@@ -187,16 +187,17 @@ TFs = coma.tf(syss)
 print(coma.pole(syss))
 #sisotool(-TFs)
 Kr = -0.1544
-#syss_CL = coma.series(coma.tf(1/Kr,1),co.feedback(co.series(coma.tf(Kr,1),syss),coma.tf(1,1),sign=-1)
-#print(syss_CL)
-#TF_CL = coma.ss2tf(syss_CL)
-#print(TF_CL)
-#print(coma.damp(syss_CL))
+syss_CL = coma.series(coma.tf(1/Kr,1),co.feedback(co.series(coma.tf(Kr,1),syss),coma.tf(1,1),sign=-1))
+print(syss_CL)
+TF_CL = coma.ss2tf(syss_CL)
+print(TF_CL)
+print(coma.damp(syss_CL))
 
 plt.figure(4)
-#Y_cl, T_cl = coma.step(syss_CL, T=np.arange(0,10,0.01))
+Y_cl, T_cl = coma.step(syss_CL, T=np.arange(0,10,0.01))
 
-#plt.plot(T_cl, Y_cl,'b')
+
+plt.plot(T_cl, Y_cl,'b')
 plt.xlabel("Time (s)")
 plt.ylabel("Amplitude")
 plt.title("Closed loop step response")
@@ -216,5 +217,31 @@ plt.plot(t, yol,'b',t,yclwo,'g',t,ycl,'r')
 plt.show()
 
 
-syss_CLgamma = coma.feedback(coma.feedback(coma.tf(Kr,1),TFsp_q_dm,sign=-1),TFp_G_dm,sign=-1)
-sisotool(-syss_CLgamma)
+syss_CLgammat = coma.series(coma.feedback(coma.tf(Kr,1),TFsp_q_dm,sign=-1),TFp_G_dm)
+# sisotool(-syss_CLgammat)
+Kg = -10.0563
+
+syss_CLgamma = coma.series(coma.feedback(coma.series(coma.tf(Kg,1), coma.feedback(coma.tf(Kr,1), TFsp_q_dm)), TFp_G_dm),  TFp_G_dm)
+
+plt.figure(6)
+Y_cl_g, T_cl_g = coma.step(syss_CLgamma, T=np.arange(0,100,0.01))
+
+
+plt.plot(T_cl_g, Y_cl_g,'b')
+plt.xlabel("Time (s)")
+plt.ylabel("Amplitude")
+plt.title("Closed loop step response")
+plt.show()
+
+print("Step info for gamma : \n")
+a,b,c = step_info(T_cl_g, Y_cl_g)
+print("Overshoot (%) : {} Rise time (s) : {} Settling time : {}".format(a,b,c))
+
+Cs_z = np.array([0,0,0,0,1])
+syss_z = coma.ss(As,Bs,Cs_z,0)
+TF_z = coma.tf(syss_z)
+
+syss_CLzt = coma.series(coma.feedback(coma.series(coma.tf(Kg,1), coma.feedback(coma.tf(Kr,1), TFsp_q_dm)), TFp_G_dm),  TF_z)
+sisotool(syss_CLzt)
+Kz = 0.00015
+
