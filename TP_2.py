@@ -111,20 +111,19 @@ TFs_z = coma.tf(coma.ss(As,Bs,Cs_z,0))
 
 ###############################################################q feedback loop
 print(coma.pole(TFs_q))
-# sisotool(-TFs_q)
+#sisotool(-TFs_q)
 Kr = -0.1544
 
-# TF_fb_q = coma.feedback(co.series(coma.tf(Kr,1),TFs_q),sign=-1)
-Ag = As - Kr*Bs*Cs_q
-Bg = Kr*Bs
-Cg = Cs_g
+#TF_fb_q = coma.feedback(co.series(coma.tf(Kr,1),TFs_q),sign=-1) #Not working
+Aq = As - Kr*Bs*Cs_q
+Bq = Kr*Bs
 
-TF_fb_q = coma.ss2tf(coma.ss(Ag,Bg,Cg,0))
-print(coma.damp(TF_fb_q))
+TF_fbq = coma.ss2tf(coma.ss(Aq,Bq,Cs_q,0))
+print(coma.damp(TF_fbq))
 
 plt.figure(2)
-Y_fb_q, T_fb_q = coma.step(TF_fb_q, T=np.arange(0,10,0.01))
-plt.plot(T_fb_q, Y_fb_q,'b')
+Y_fbq, T_fbq = coma.step(TF_fbq, T=np.arange(0,10,0.01))
+plt.plot(T_fbq, Y_fbq,'b')
 plt.xlabel("Time (s)")
 plt.ylabel("Amplitude")
 plt.title("q closed loop step response")
@@ -134,25 +133,42 @@ plt.show()
 
 
 ###########################################################gamma feedback loop
-TF_ol_g = coma.series(coma.feedback(coma.tf(Kr,1),TFs_q,sign=-1), TFs_g)
-# sisotool(TF_fb_q)
-Kg = 7.97203
+#TF_ol_g = coma.series(coma.feedback(coma.tf(Kr,1),TFs_q,sign=-1), TFs_g) #Not working
+TF_fbq_g = coma.ss2tf(coma.ss(Aq,Bq,Cs_g,0))
+# sisotool(TF_fbq_g)
+Kg = 8.11037
 
-#TF_fb_g = coma.feedback(coma.series(coma.tf(Kg,1), TF_ol_g), 1, sign=-1)
+#TF_fb_g = coma.feedback(coma.series(coma.tf(Kg,1), TF_ol_g), 1, sign=-1) #Not working
 
-Az = Ag - Kg*Bg*Cs_g
-Bz = Kg*Bg
-Cz = Cs_z
-TF_fb_g = coma.ss2tf(coma.ss(Az,Bz,Cz,0))
-print(coma.damp(TF_fb_g))
+Ag = Aq - Kg*Bq*Cs_g
+Bg = Kg*Bq
+
+TF_fbg = coma.ss2tf(coma.ss(Ag,Bg,Cs_g,0))
+print(coma.damp(TF_fbg))
 
 plt.figure(3)
-Y_fb_g, T_fb_g = coma.step(TF_fb_g, T=np.arange(0,10,0.01))
-plt.plot(T_fb_g, Y_fb_g,'b')
+Y_fbg, T_fbg = coma.step(TF_fbg, T=np.arange(0,10,0.01))
+plt.plot(T_fbg, Y_fbg,'b')
 plt.xlabel("Time (s)")
 plt.ylabel("Amplitude")
 plt.title("gamma closed loop step response")
 plt.show()
 
 ###############################################################z feedback loop
-sisotool(TF_fb_g)
+TF_fbg_z = coma.ss2tf(coma.ss(Ag,Bg,Cs_z,0))
+sisotool(TF_fbg_z)
+Kz = 0.00122
+
+Az = Ag - Kz*Bg*Cs_z
+Bz = Kz*Bg
+
+TF_fbz = coma.ss2tf(coma.ss(Az,Bz,Cs_z,0))
+print(coma.damp(TF_fbz))
+
+plt.figure(4)
+Y_fbz, T_fbz = coma.step(TF_fbz, T=np.arange(0,10,0.01))
+plt.plot(T_fbz, Y_fbz,'b')
+plt.xlabel("Time (s)")
+plt.ylabel("Amplitude")
+plt.title("altitude closed loop step response")
+plt.show()
