@@ -185,12 +185,10 @@ Ds = np.zeros([5,1])
 syss = coma.ss(As,Bs,Cs_q,0)
 TFs = coma.tf(syss)
 print(coma.pole(syss))
-#sisotool(-TFs)
+# sisotool(-TFs)
 Kr = -0.1544
-syss_CL = coma.series(coma.tf(1/Kr,1),co.feedback(co.series(coma.tf(Kr,1),syss),coma.tf(1,1),sign=-1))
+syss_CL = co.feedback(co.series(coma.tf(Kr,1),TFs),sign=-1)
 print(syss_CL)
-TF_CL = coma.ss2tf(syss_CL)
-print(TF_CL)
 print(coma.damp(syss_CL))
 
 plt.figure(4)
@@ -242,6 +240,6 @@ syss_z = coma.ss(As,Bs,Cs_z,0)
 TF_z = coma.tf(syss_z)
 
 syss_CLzt = coma.series(coma.feedback(coma.series(coma.tf(Kg,1), coma.feedback(coma.tf(Kr,1), TFsp_q_dm)), TFp_G_dm),  TF_z)
-sisotool(syss_CLzt)
+sisotool(-syss_CLzt)
 Kz = 0.00015
 
